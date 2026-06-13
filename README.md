@@ -2,14 +2,14 @@
 
 Natchen's API for making websocket with everything.
 
-A lightweight WebSocket relay running at **ws.natchen.us.kg**. No install, no SDK, no dependencies on your end - just HTTP and WebSocket.
+A lightweight WebSocket relay running at **ws.natchen.fr**. No install, no SDK, no dependencies on your end - just HTTP and WebSocket.
 
 ---
 
 ## How it works
 
 ```
-Your browser  --WSS-->  ws.natchen.us.kg  --ws://-->  Node relay
+Your browser  --WSS-->  ws.natchen.fr  --ws://-->  Node relay
                                                            |
 Your backend  --HTTP POST /send/{id}/-->               broadcasts to clients
 ```
@@ -23,7 +23,7 @@ The relay has no business logic. You create a session, get keys, connect your cl
 ### 1. Create a session
 
 ```http
-POST https://ws.natchen.us.kg/create
+POST https://ws.natchen.fr/create
 Content-Type: application/json
 
 {
@@ -50,7 +50,7 @@ Response:
 
 ```javascript
 const ws = new WebSocket(
-  `wss://ws.natchen.us.kg/${id}/?key=${encodeURIComponent(client_key)}`
+  `wss://ws.natchen.fr/${id}/?key=${encodeURIComponent(client_key)}`
 );
 
 ws.onmessage = (e) => {
@@ -65,7 +65,7 @@ ws.onmessage = (e) => {
 ### 3. Push from your backend
 
 ```bash
-curl -X POST https://ws.natchen.us.kg/send/50RmIlbJjdwnYUIH/ \
+curl -X POST https://ws.natchen.fr/send/50RmIlbJjdwnYUIH/ \
   -H "Host-Key: jaPQzLxMP79tZiu0..." \
   -H "Content-Type: application/json" \
   -d '{"type":"hello","message":"world"}'
@@ -148,7 +148,7 @@ Content-Type: application/json
 ```javascript
 // Get a one-time key from your backend, then connect
 const ws = new WebSocket(
-  `wss://ws.natchen.us.kg/${id}/?key=${encodeURIComponent(oneTimeKey)}`
+  `wss://ws.natchen.fr/${id}/?key=${encodeURIComponent(oneTimeKey)}`
 );
 ```
 
