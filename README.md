@@ -282,6 +282,46 @@ function stopPolling() {
 
 ---
 
+## Keepalive
+
+The relay automatically sends a `{"type":"keepalive"}` data frame to all redirect-session clients every **25 seconds** to keep the server→client direction alive through proxies.
+
+Clients must also send keepalives every **20 seconds** to keep the client→server direction alive. The relay silently drops these — they are never forwarded to your `send_url`.
+
+```javascript
+async function connectWs(sessionUrl, clientKey) {
+  clearTimeout(retryTimer);
+  if (ws && ws.readyState <= 1) return;
+
+  ws = new WebSocket(`${sessionUrl}?key=${encodeURIComponent(clientKey)}`);
+
+  let kaTimer = null;
+  ws.onopen = () => {
+    stopPolling();
+    kaTimer = setInterval(() => {
+      if (ws && ws.readyState === 1) ws.send(JSON.stringify({ type: 'keepalive' }));
+    }, 20000);
+  };
+
+  ws.onmessage = (e) => {
+    const payload = JSON.parse(JSON.parse(e.data).body);
+    if (payload.type === 'keepalive') return; // relay heartbeat — ignore
+    handleEvent(payload);
+  };
+
+  ws.onclose = () => {
+    clearInterval(kaTimer);
+    ws = null;
+    startPolling();
+    retryTimer = setTimeout(() => connectWs(sessionUrl, clientKey), 15000);
+  };
+
+  ws.onerror = () => startPolling();
+}
+```
+
+---
+
 ## Errors
 
 All HTTP error responses follow the same shape:
